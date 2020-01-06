@@ -3,12 +3,13 @@ const cors = require('cors');
 const mysql = require('mysql');
 
 const app = express();
+const dotenv = require('dotenv').config();
 
 var con = mysql.createConnection({
-  database: 'tickets',
-  host: "localhost",
-  user: "",
-  password: ""
+  database: process.env.DB_DATABASE,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD
 });
 
 con.connect(function(err) {
@@ -26,7 +27,7 @@ app.get('/', (request, response) => {
 });
 
 app.get('/tickets', (request, response) => {
-  con.query('select * from alltickets;', function (err, data) {
+  con.query('select * from alltickets where status="Open";', function (err, data) {
     response.send(data);
   });
 });

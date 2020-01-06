@@ -1,6 +1,8 @@
 const API_URL = "http://localhost:5005/tickets";
 const form = document.querySelector("#ticketForm");
 
+listAllTickets();
+
 form.addEventListener(
   "submit",
   function(event) {
@@ -27,10 +29,20 @@ form.addEventListener(
   false
 );
 
-function listAllTickets(){
-  fetch(API_URL).then(response => response.json()).then(tickets => {
-    
-  })
+function listAllTickets() {
+  fetch(API_URL)
+    .then(response => response.json())
+    .then(tickets => {
+      tickets.forEach(ticket => {
+        var newTicket = document.createElement("p");
+        var texter = ticket.topic + ", " + ticket.issue;
+        var text = document.createTextNode(texter);
+        newTicket.appendChild(text);
+
+        var parent = document.getElementById("newTickets");
+        parent.appendChild(newTicket);
+      });
+    });
 }
 
 function addNewTicket(ticket) {
@@ -42,7 +54,7 @@ function addNewTicket(ticket) {
     }
   });
   var newTicket = document.createElement("p");
-  var texter = ticket.fromUser + ", " + ticket.topic;
+  var texter = ticket.topic + ", " + ticket.issue;
   var text = document.createTextNode(texter);
   newTicket.appendChild(text);
   console.log("ayy");
