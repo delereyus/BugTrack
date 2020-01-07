@@ -3,7 +3,10 @@ const cors = require('cors');
 const mysql = require('mysql');
 
 const app = express();
+const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv').config();
+
+let userIdValue = 1;
 
 var con = mysql.createConnection({
   database: process.env.DB_DATABASE,
@@ -20,9 +23,11 @@ con.connect(function(err) {
 app.use(cors());
 app.use(express.json());
 
+
+
 app.get('/', (request, response) => {
   response.json({
-    message: 'Hello Worldayyyyyy'
+    message: 'Hello Worldayyyyyyy'
   });
 });
 
@@ -38,7 +43,11 @@ function isValidTicket(ticket){
           ticket.fromUser && ticket.fromUser.toString().trim() != '';
 }
 
-let userIdValue = 1;
+
+app.use(rateLimit({
+  windowMs: 15 * 1000,
+  max: 1
+}));
 
 app.post('/tickets', (req, res) => {
   if (isValidTicket(req.body)) {
@@ -51,6 +60,7 @@ app.post('/tickets', (req, res) => {
     let time = getTime();
     try{
     con.query(`INSERT INTO alltickets (userId, topic, issue, date, time) VALUES (${userIdValue}, '${ticket.topic}', '${ticket.issue}', '${date}', '${time}');`);
+    res.send('Successfully posted ticket!')
     } catch(err){
       console.log('there has been an error');
     }
