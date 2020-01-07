@@ -32,15 +32,20 @@ app.get('/', (request, response) => {
 });
 
 app.get('/tickets', (request, response) => {
-  con.query('select * from alltickets where status="Open";', function (err, data) {
+  con.query('select * from alltickets where issueStatus="Open";', function (err, data) {
+    response.send(data);
+  });
+});
+
+app.get('/ticketsfortable', (request, response) => {
+  con.query('SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.project = a.projectId JOIN allprojects p ON p.projectId = a.projectId;', function (err, data) {
     response.send(data);
   });
 });
 
 function isValidTicket(ticket){
   return ticket.topic && ticket.topic.toString().trim() != '' &&
-          ticket.issue && ticket.issue.toString().trim() != '' &&
-          ticket.fromUser && ticket.fromUser.toString().trim() != '';
+          ticket.issue && ticket.issue.toString().trim() != '';
 }
 
 
@@ -52,14 +57,17 @@ app.use(rateLimit({
 app.post('/tickets', (req, res) => {
   if (isValidTicket(req.body)) {
     const ticket = {
-      from: req.body.fromUser.toString(),
+      submitterId: req.body.submitterId.toString(),
+      projectId: req.body.projectId.toString(),
       topic: req.body.topic.toString(),
-      issue: req.body.issue.toString()
+      issue: req.body.issue.toString(),
+      date: req.body.date.toString(),
+      time: req.body.time.toString()
     };
     let date = getDate();
     let time = getTime();
     try{
-    con.query(`INSERT INTO alltickets (userId, topic, issue, date, time) VALUES (${userIdValue}, '${ticket.topic}', '${ticket.issue}', '${date}', '${time}');`);
+    con.query(`INSERT INTO alltickets (submitterId, topic, issue, submitDate, submitTime) VALUES (${userIdValue}, '${ticket.topic}', '${ticket.issue}', '${date}', '${time}');`);
     res.send('Successfully posted ticket!')
     } catch(err){
       console.log('there has been an error');

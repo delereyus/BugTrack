@@ -35,6 +35,7 @@ function listAllTickets() {
     .then(tickets => {
       tickets.forEach(ticket => {
         var newTicket = document.createElement("p");
+        newTicket.className = 'ticketElement';
         var texter = ticket.topic + ", " + ticket.issue;
         var text = document.createTextNode(texter);
         newTicket.appendChild(text);

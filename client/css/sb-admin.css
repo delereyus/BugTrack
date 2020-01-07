@@ -122,6 +122,44 @@ ul ol {
   margin-bottom: 0;
 }
 
+.ticketList{
+  list-style: none;
+}
+
+.ticketList a{
+  font-weight: bold;
+}
+
+.projectList{
+  list-style: none;
+}
+
+#projectDataTable{
+  margin-top: 1.25rem;
+}
+
+#ticketRow{
+  margin-top: 1.25rem;
+}
+
+.ticketHeader{
+  font-size: 1.25rem;
+}
+
+.ticketElement{
+  font-size: 1rem;
+  margin-top: 0.5rem
+}
+
+#ticketFormContainer{
+  text-align: center;
+  width: 100rem;
+}
+
+#issue{
+  width: 40%;
+}
+
 dt {
   font-weight: 700;
 }

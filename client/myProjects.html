@@ -158,14 +158,32 @@
       <div id="content-wrapper">
         <div class="container-fluid">
           <!-- Icon Cards-->
-          <div class="row">
+          <div class="card text-white bg-info o-hidden h-100">
+            <div class="card-body" id="projects">
+              <div class="card-body-icon">
+                <i class="fas fa-fw fa-times-circle"></i>
+              </div>
+              <div class="mr-5"><h3>My Projects</h3></div>
+              <ul class="projectList">
+                <li><a class="text-white clearfix medium z-1" id="project1" href="#">
+                  <span><b>Bug Tracker </b></span>
+                  <i class="fas fa-angle-right"></i></a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Tickets-->
+          <div class="row" id="ticketRow">
             <div class="col-xl-3 col-sm-6 mb-3">
               <div class="card text-white bg-primary o-hidden h-100">
                 <div class="card-body" id="newTickets">
                   <div class="card-body-icon">
                     <i class="fas fa-fw fa-times-circle"></i>
                   </div>
-                  <div class="mr-5">New Tickets</div>
+                  <div class="mr-5"><h3 class="ticketHeader">New Tickets</h3></div>
+                  <ul class="ticketList">
+                  </ul>
                 </div>
                 <a class="card-footer text-white clearfix small z-1" href="#">
                   <span class="float-left">View Details</span>
@@ -181,7 +199,7 @@
                   <div class="card-body-icon">
                     <i class="fas fa-fw fa-cog"></i>
                   </div>
-                  <div class="mr-5">Under Development</div>
+                  <div class="mr-5"><h3 class="ticketHeader">In Progress</h3></div>
                 </div>
                 <a class="card-footer text-white clearfix small z-1" href="#">
                   <span class="float-left">View Details</span>
@@ -197,7 +215,7 @@
                   <div class="card-body-icon">
                     <i class="fas fa-fw fa-check-circle"></i>
                   </div>
-                  <div class="mr-5">Finished</div>
+                  <div class="mr-5"><h3 class="ticketHeader">Resolved</h3></div>
                 </div>
                 <a class="card-footer text-white clearfix small z-1" href="#">
                   <span class="float-left">View Details</span>
@@ -207,20 +225,57 @@
                 </a>
               </div>
             </div>
-            <div class="container-fluid">
+            <!-- ./Tickets-->
+            <div class="container-fluid" id="ticketFormContainer">
               <form id="ticketForm">
-                <label for="fromUser">From</label>
-                <input type="text" id="fromUser" name="fromUser" />
                 <label for="topic">Topic</label>
                 <input type="text" id="topic" name="topic" />
-                <label for="issue">Issue</label>
-                <input type="text" id="issue" name="issue" />
                 <button id="submitTicket">
                   Submit
                 </button>
               </form>
+              <label for="issue">Issue</label>
+                <textarea id="issue" name="issue" form="ticketForm" placeholder="Max 200 characters..."></textarea>
+            </div>
+
+            <!-- Project Datatable-->
+          <div class="card mb-3" id="projectDataTable">
+            <div class="card-header">
+              <i class="fas fa-table"></i>
+              Ticket Information
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table
+                  class="table table-bordered"
+                  id="dataTable"
+                  width="100%"
+                  cellspacing="0"
+                >
+                  <thead>
+                    <tr>
+                      <th>Project</th>
+                      <th>Submitting User</th>
+                      <th>User Role</th>
+                      <th>Topic</th>
+                      <th>Issue</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  
+                  <tbody id="tableBody">
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card-footer small text-muted">
+              Updated yesterday at 11:59 PM
             </div>
           </div>
+          <!-- /.Project Datatable-->
         </div>
         <!-- /.container-fluid -->
 
@@ -290,6 +345,6 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin.min.js"></script>
-    <script src="js/ticket.js"></script>
+    <script src="js/projects.js"></script>
   </body>
 </html>
