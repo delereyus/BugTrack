@@ -5,77 +5,36 @@ const projectDataTable = document.querySelector("#projectDataTable");
 const ticketTableBody = document.querySelector("#tableBody");
 const form = document.querySelector("#ticketForm");
 
+const newTicketFooter = document.querySelector('#newTicketFooter');
+
 const API_TICKET_TABLE_URL = "http://localhost:5005/ticketsfortable";
 const API_URI = "http://localhost:5005/tickets";
 
 projectDataTable.style.display = "none";
 ticketRow.style.display = "none";
 
+let isClicked = false;
+
 listAllTickets();
 
-//Currently adding new elements each time
+newTicketFooter.addEventListener('click', function(event) {
+  event.preventDefault();
+  createDataTable();
+
+  if (projectDataTable.style.display === 'none'){
+    projectDataTable.style.display = '';
+    } else projectDataTable.style.display = 'none';
+});
+
+
+//Bring up each ticket's description, let user choose to start working and so on
 ticketLista.forEach(ticketa => {
   ticketa.addEventListener('click', function(event) {
     event.preventDefault();
 
-    fetch(API_TICKET_TABLE_URL)
-    .then(response => response.json())
-    .then(tickets => {
-      tickets.forEach(ticket => {
-       let newTableRow = document.createElement('tr');
-
-       let prjName = document.createElement('td');
-       let userName = document.createElement('td');
-       let userRole = document.createElement('td');
-       let topic = document.createElement('td');
-       let issue = document.createElement('td');
-       let submitDate = document.createElement('td');
-       let submitTime = document.createElement('td');
-       let status = document.createElement('td');
-
-       let projText = ticket.projectName;
-       let userText = ticket.userName;
-       let roleText = ticket.userRole;
-       let topicText = ticket.topic;
-       let issueText = ticket.issue;
-       let dateText = ticket.submitDate;
-       let timeText = ticket.submitTime;
-       let statusText = ticket.issueStatus;
-
-       let textProj = document.createTextNode(projText);
-       let textUser = document.createTextNode(userText);
-       let textRole = document.createTextNode(roleText);
-       let textTopic = document.createTextNode(topicText);
-       let textIssue = document.createTextNode(issueText);
-       let textDate = document.createTextNode(dateText);
-       let textTime = document.createTextNode(timeText);
-       let textStatus = document.createTextNode(statusText);
-
-       prjName.appendChild(textProj);
-       userName.appendChild(textUser);
-       userRole.appendChild(textRole);
-       topic.appendChild(textTopic);
-       issue.appendChild(textIssue);
-       submitDate.appendChild(textDate);
-       submitTime.appendChild(textTime);
-       status.appendChild(textStatus);
-       
-       newTableRow.appendChild(prjName);
-       newTableRow.appendChild(userName);
-       newTableRow.appendChild(userRole);
-       newTableRow.appendChild(topic);
-       newTableRow.appendChild(issue);
-       newTableRow.appendChild(submitDate);
-       newTableRow.appendChild(submitTime);
-       newTableRow.appendChild(status);
-
-       ticketTableBody.appendChild(newTableRow);
-      });
-    });
     
-    if (projectDataTable.style.display === 'none'){
-      projectDataTable.style.display = '';
-      } else projectDataTable.style.display = 'none';
+    
+    
   })
 }, false);
 
@@ -141,6 +100,75 @@ function listAllTickets() {
         ticketList.appendChild(newTicket);
       });
     });
+}
+
+function createDataTable(){
+  if(!isClicked){
+
+    fetch(API_TICKET_TABLE_URL)
+    .then(response => response.json())
+    .then(tickets => {
+      tickets.forEach(ticket => {
+       let newTableRow = document.createElement('tr');
+       newTableRow.className = 'newTableRow';
+
+       let prjName = document.createElement('td');
+       let userName = document.createElement('td');
+       let userRole = document.createElement('td');
+       let topic = document.createElement('td');
+       let issue = document.createElement('td');
+       let submitDate = document.createElement('td');
+       let submitTime = document.createElement('td');
+       let status = document.createElement('td');
+
+       let projText = ticket.projectName;
+       let userText = ticket.userName;
+       let roleText = ticket.userRole;
+       let topicText = ticket.topic;
+       let issueText = ticket.issue;
+       let dateText = ticket.submitDate;
+       let timeText = ticket.submitTime;
+       let statusText = ticket.issueStatus;
+
+       let textProj = document.createTextNode(projText);
+       let textUser = document.createTextNode(userText);
+       let textRole = document.createTextNode(roleText);
+       let textTopic = document.createTextNode(topicText);
+       let textIssue = document.createTextNode(issueText);
+       let textDate = document.createTextNode(dateText);
+       let textTime = document.createTextNode(timeText);
+       let textStatus = document.createTextNode(statusText);
+
+       prjName.appendChild(textProj);
+       userName.appendChild(textUser);
+       userRole.appendChild(textRole);
+       topic.appendChild(textTopic);
+       issue.appendChild(textIssue);
+       submitDate.appendChild(textDate);
+       submitTime.appendChild(textTime);
+       status.appendChild(textStatus);
+       
+       newTableRow.appendChild(prjName);
+       newTableRow.appendChild(userName);
+       newTableRow.appendChild(userRole);
+       newTableRow.appendChild(topic);
+       newTableRow.appendChild(issue);
+       newTableRow.appendChild(submitDate);
+       newTableRow.appendChild(submitTime);
+       newTableRow.appendChild(status);
+
+       ticketTableBody.appendChild(newTableRow);
+
+       isClicked = true;
+      
+      });
+    });
+  } else {
+    document.querySelectorAll('.newTableRow').forEach(row => {
+      row.remove();
+    });
+    isClicked = false;
+  }
 }
 
 function addNewTicket(ticket) {
