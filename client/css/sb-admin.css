@@ -160,6 +160,19 @@ ul ol {
   width: 40%;
 }
 
+#descriptionContainer{
+  width: 45%;
+}
+
+#ticketDescription{
+  position: relative;
+  align-self: center;
+}
+
+#issueDescriptionLabel{
+  font-size: 1.5rem;
+}
+
 dt {
   font-weight: 700;
 }
