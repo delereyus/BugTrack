@@ -1,47 +1,28 @@
-const API_URL = "http://localhost:5005/tickets";
+const API_ALL_TICKETS_URL = "http://localhost:5005/tickets";
+const API_OPEN_TICKET_URL = "http://localhost:5005/ticketsopen";
+const API_IN_PROGRESS_TICKET_URL = "http://localhost:5005/ticketsinprogress";
+const API_RESOLVED_TICKET_URL = "http://localhost:5005/ticketsresolved";
 const form = document.querySelector("#ticketForm");
 
-listAllTickets();
+listAllTickets(API_ALL_TICKETS_URL);
 
-form.addEventListener(
-  "submit",
-  function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    const formData = new FormData(form);
-    const fromUser = formData.get("fromUser");
-    const topic = formData.get("topic");
-    const issue = formData.get("issue");
-    const time = getTime();
-    const date = getDate();
-    const newTicket = {
-      fromUser: fromUser,
-      topic: topic,
-      issue: issue,
-      date,
-      time
-    };
-    console.log(newTicket);
-    addNewTicket(newTicket);
-    form.reset();
-  },
-  false
-);
-
-function listAllTickets() {
-  fetch(API_URL)
+function listAllTickets(status) {
+  fetch(status)
     .then(response => response.json())
     .then(tickets => {
       tickets.forEach(ticket => {
-        var newTicket = document.createElement("p");
-        newTicket.className = 'ticketElement';
-        var texter = ticket.topic + ", " + ticket.issue;
-        var text = document.createTextNode(texter);
-        newTicket.appendChild(text);
+  var newTicket = document.createElement("li");
+  var ticketSpan = document.createElement("span");
+  ticketSpan.className = "text-white clearfix medium z-1";
 
-        var parent = document.getElementById("newTickets");
-        parent.appendChild(newTicket);
+  var texter = ticket.topic;
+  var text = document.createTextNode(texter);
+  ticketSpan.appendChild(text);
+
+  newTicket.appendChild(ticketSpan);
+
+  var ticketList = document.querySelector(".ticketList");
+  ticketList.appendChild(newTicket);
       });
     });
 }

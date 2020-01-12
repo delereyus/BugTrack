@@ -3,17 +3,13 @@ const projects = document.querySelectorAll(".projectList");
 const projectDataTable = document.querySelector("#projectDataTable");
 const ticketTableBody = document.querySelector("#tableBody");
 const form = document.querySelector("#ticketForm");
-const ticketDescription = document.querySelector("#ticketDescription");
 const newTableRow = document.querySelectorAll(".newTableRow");
 const topicClass = document.querySelectorAll(".topicClass");
-const issueDescriptionContainer = document.querySelector(
-  "#descriptionContainer"
-);
+const issueDescriptionContainer = document.querySelector("#descriptionContainer");
+const ticketCard = document.querySelector('#ticketCard');
 
 const newTicketFooter = document.querySelector("#newTicketFooter");
-const inProgressTicketFooter = document.querySelector(
-  "#inProgressTicketFooter"
-);
+const inProgressTicketFooter = document.querySelector("#inProgressTicketFooter");
 const resolvedTicketFooter = document.querySelector("#resolvedTicketFooter");
 
 const openArrow = document.querySelector("#openArrow");
@@ -94,7 +90,7 @@ projects.forEach(project => {
     if (ticketIsClicked == true) {
       removeTicket();
     }
-    
+
     if (ticketRow.style.display === "none") {
       ticketRow.style.display = "";
     } else ticketRow.style.display = "none";
@@ -138,21 +134,39 @@ function showTicket(ticketTopic) {
 }
 
 function createTicket(ticket) {
-  let issueParagraph = document.createElement("p");
-  issueParagraph.id = "issueParagraph";
-  let issueText = ticket.issue;
-  lastTicketShown = issueText;
-  let textIssue = document.createTextNode(issueText);
-  issueParagraph.appendChild(textIssue);
 
-  ticketDescription.appendChild(issueParagraph);
+  let newHeader = document.createElement('h5');
+  let newPar = document.createElement('p');
+
+  newHeader.className = 'card-title';
+  newHeader.id = 'issueDescriptionLabel';
+
+  newPar.className = 'card-text';
+  newPar.id = 'ticketDescription';
+
+  let issueText = ticket.issue;
+  let textIssue = document.createTextNode(issueText);
+
+  let topicText = ticket.topic;
+  topicNode = document.createTextNode(topicText);
+
+  newHeader.appendChild(topicNode);
+  newPar.appendChild(textIssue);
+
+  ticketCard.appendChild(newHeader);
+  ticketCard.appendChild(newPar);
+
   ticketIsClicked = true;
+  lastTicketShown = issueText;
   issueDescriptionContainer.style.display = "";
 }
 
 function removeTicket() {
-  let paragraph = document.querySelector("#issueParagraph");
-  paragraph.remove();
+  let ticketDescription = document.querySelector("#ticketDescription");
+  ticketDescription.remove();
+  let ticketHeader = document.querySelector('#issueDescriptionLabel');
+  ticketHeader.remove();
+
   ticketIsClicked = false;
   if (issueDescriptionContainer.style.display === "none") {
     issueDescriptionContainer.style.display = "";
@@ -197,6 +211,7 @@ function createDataTable(ticketUrl) {
           linkToTicketDescription.appendChild(textTopic);
 
           linkToTicketDescription.addEventListener("click", function(event) {
+            event.preventDefault();
             showTicket(topicText);
           });
 
@@ -246,6 +261,20 @@ function addNewTicket(ticket) {
       "content-type": "application/json"
     }
   });
+  showDataTableAfterPosting();
+}
+
+function showDataTableAfterPosting(){
+  removeDataTable();
+  setTimeout(function () {
+    if (lastStatusShown === '#openArrow'){
+      createDataTable(API_OPEN_TICKET_URL);
+    } else if (lastStatusShown === '#inProgressArrow'){
+      createDataTable(API_IN_PROGRESS_TICKET_URL);
+    } else if (lastStatusShown === '#resolvedArrow'){
+      createDataTable(API_RESOLVED_TICKET_URL);
+    }
+  }, 100)
 }
 
 form.addEventListener(

@@ -172,8 +172,10 @@
               </ul>
             </div>
           </div>
+        </div>
 
           <!-- Tickets-->
+        <div class="container-fluid">
           <div class="row" id="ticketRow">
             <div class="col-xl-3 col-sm-6 mb-3">
               <div class="card text-white bg-primary o-hidden h-100">
@@ -181,7 +183,7 @@
                   <div class="card-body-icon">
                     <i class="fas fa-fw fa-times-circle"></i>
                   </div>
-                  <div class="mr-5"><h3 class="ticketHeader">New Tickets</h3></div>
+                  <div class="mr-5"><h3 class="ticketHeader">Open</h3></div>
                 </div>
                 <a class="card-footer text-white clearfix small z-1" id="newTicketFooter" href="#">
                   <span class="float-left">View Details</span>
@@ -223,20 +225,21 @@
                 </a>
               </div>
             </div>
+          </div>
             <!-- ./Tickets-->
-            <div class="container-fluid" id="ticketFormContainer">
-              <form id="ticketForm">
-                <label for="topic">Topic</label>
-                <input type="text" id="topic" name="topic" />
-                <button id="submitTicket">
-                  Submit
-                </button>
-              </form>
-              <label for="issue">Issue</label>
-                <textarea id="issue" name="issue" form="ticketForm" placeholder="Max 200 characters..." maxlength="200"></textarea>
+
+          <div class="container-fluid">
+            <div class="col mx-auto" id="descriptionContainer">
+              <div class="card">
+                <div class="card-body" id="ticketCard">
+                  
+                </div>
+              </div>
             </div>
+          </div>
 
             <!-- Project Datatable-->
+        <div class="container-fluid">
           <div class="card mb-3" id="projectDataTable">
             <div class="card-header">
               <i class="fas fa-table"></i>
@@ -269,24 +272,39 @@
                 </table>
               </div>
             </div>
-            <div class="card-footer small text-muted">
-              Updated yesterday at 11:59 PM
-            </div>
           </div>
           <!-- /.Project Datatable-->
         </div>
         <!-- /.container-fluid -->
 
-        <div class="container-fluid" id="descriptionContainer">
-          <label for="ticketDescription" id="issueDescriptionLabel">Issue Description</label>
-          <div class="card" id="ticketDescription"></div>
+      <div class="container-fluid">
+        <div class="col mx-auto">
+          <form id="ticketForm">
+          </form>
+          <div class="form-group" id="issueAndSubmit">
+            <label for="topic">Topic</label>
+            <input type="text" class="form-control" id="topic" name="topic" form="ticketForm" />
+          </div>
+          <div class="form-group">
+            <label for="issue">Issue</label>
+            <textarea class="form-control" id="issue" name="issue" form="ticketForm" placeholder="Max 200 characters..." maxlength="200"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlFile1"></label>
+            <input type="file" class="form-control-file" id="exampleFormControlFile1">
+          </div>
+            <button type="submit" class="btn btn-primary" id="submitTicket" form="ticketForm">
+              Submit
+            </button>
+          </div>
         </div>
+      </div>
 
         <!-- Sticky Footer -->
         <footer class="sticky-footer">
           <div class="container my-auto">
             <div class="copyright text-center my-auto">
-              <span>Copyright © Your Website 2019</span>
+              <span>Copyright © Emanuel Harling 2020</span>
             </div>
           </div>
         </footer>

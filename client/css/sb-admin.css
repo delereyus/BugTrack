@@ -152,21 +152,7 @@ ul ol {
 }
 
 #ticketFormContainer{
-  text-align: center;
-  width: 100rem;
-}
-
-#issue{
-  width: 40%;
-}
-
-#descriptionContainer{
-  width: 45%;
-}
-
-#ticketDescription{
-  position: relative;
-  align-self: center;
+  width: 100%;
 }
 
 #issueDescriptionLabel{

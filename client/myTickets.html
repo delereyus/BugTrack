@@ -89,12 +89,12 @@
           <span>Project Management</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="tables.html">
+        <a class="nav-link" href="myProjects.html">
           <i class="fas fa-fw fa-project-diagram"></i>
           <span>My Projects</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="tables.html">
+        <a class="nav-link" href="myTickets.html">
           <i class="fas fa-fw fa-ticket-alt"></i>
           <span>My Tickets</span></a>
       </li>
@@ -118,11 +118,14 @@
         <div class="row">
           <div class="col-xl-3 col-sm-6 mb-3">
             <div class="card text-white bg-primary o-hidden h-100">
-              <div class="card-body" id="newTickets">
+              <div class="card-body">
                 <div class="card-body-icon">
                   <i class="fas fa-fw fa-times-circle"></i>
                 </div>
-                <div class="mr-5">New Tickets</div>
+                <div class="mr-5"><h3 class="ticketHeader">Open</h3></div>
+                <ul class="ticketList">
+
+                </ul>
               </div>
               <a class="card-footer text-white clearfix small z-1" href="#">
                 <span class="float-left">View Details</span>
@@ -138,7 +141,7 @@
                 <div class="card-body-icon">
                   <i class="fas fa-fw fa-cog"></i>
                 </div>
-                <div class="mr-5">Under Development</div>
+                <div class="mr-5"><h3 class="ticketHeader">In Progress</h3></div>
               </div>
               <a class="card-footer text-white clearfix small z-1" href="#">
                 <span class="float-left">View Details</span>
@@ -154,7 +157,7 @@
                 <div class="card-body-icon">
                   <i class="fas fa-fw fa-check-circle"></i>
                 </div>
-                <div class="mr-5">Finished</div>
+                <div class="mr-5"><h3 class="ticketHeader">Resolved</h3></div>
               </div>
               <a class="card-footer text-white clearfix small z-1" href="#">
                 <span class="float-left">View Details</span>
@@ -165,8 +168,30 @@
             </div>
           </div>
         </div>
+        
       </div>
       <!-- /.container-fluid -->
+
+      <div class="col-4 mx-auto">
+        <form id="ticketForm">
+        </form>
+        <div class="form-group" id="issueAndSubmit">
+          <label for="topic">Topic</label>
+          <input type="text" class="form-control" id="topic" name="topic" form="ticketForm" />
+        </div>
+        <div class="form-group">
+          <label for="issue">Issue</label>
+          <textarea class="form-control" id="issue" name="issue" form="ticketForm" placeholder="Max 200 characters..." maxlength="200"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="exampleFormControlFile1"></label>
+          <input type="file" class="form-control-file" id="exampleFormControlFile1">
+        </div>
+          <button type="submit" class="btn btn-primary" id="submitTicket" form="ticketForm">
+            Submit
+          </button>
+        </div>
+      </div>
 
       <!-- Sticky Footer -->
       <footer class="sticky-footer">
