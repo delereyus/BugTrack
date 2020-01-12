@@ -85,6 +85,7 @@ projects.forEach(project => {
     } else {
       document.querySelector("#projectsArrow").className = arrowRight;
       projectsIsClicked = false;
+      dataTableDisplay();
     }
 
     if (ticketIsClicked == true) {
@@ -277,7 +278,7 @@ function showDataTableAfterPosting(){
   }, 100)
 }
 
-form.addEventListener(
+/*form.addEventListener(
   "submit",
   function(event) {
     event.preventDefault();
@@ -301,7 +302,7 @@ form.addEventListener(
     form.reset();
   },
   false
-);
+);*/
 
 function listAllTickets() {
   fetch(API_ALL_TICKETS_URL)
