@@ -5,11 +5,15 @@ const ticketTableBody = document.querySelector("#tableBody");
 const form = document.querySelector("#ticketForm");
 const newTableRow = document.querySelectorAll(".newTableRow");
 const topicClass = document.querySelectorAll(".topicClass");
-const issueDescriptionContainer = document.querySelector("#descriptionContainer");
-const ticketCard = document.querySelector('#ticketCard');
+const issueDescriptionContainer = document.querySelector(
+  "#descriptionContainer"
+);
+const ticketCard = document.querySelector("#ticketCard");
 
 const newTicketFooter = document.querySelector("#newTicketFooter");
-const inProgressTicketFooter = document.querySelector("#inProgressTicketFooter");
+const inProgressTicketFooter = document.querySelector(
+  "#inProgressTicketFooter"
+);
 const resolvedTicketFooter = document.querySelector("#resolvedTicketFooter");
 
 const openArrow = document.querySelector("#openArrow");
@@ -85,16 +89,17 @@ projects.forEach(project => {
     } else {
       document.querySelector("#projectsArrow").className = arrowRight;
       projectsIsClicked = false;
-      dataTableDisplay();
     }
 
     if (ticketIsClicked == true) {
       removeTicket();
     }
-
+    dataTableDisplay();
     if (ticketRow.style.display === "none") {
       ticketRow.style.display = "";
     } else ticketRow.style.display = "none";
+
+    changeArrow(lastStatusShown);
   });
 }, false);
 
@@ -105,11 +110,16 @@ function changeArrow(target) {
 
   if (lastStatusShown == target && projectDataTable.style.display === "") {
     document.querySelector(target).className = arrowDown;
-  }
+  } else document.querySelector(target).className = arrowRight;
 }
 
 function dataTableDisplay() {
-  if (projectDataTable.style.display === "none") {
+  if 
+  (
+    projectDataTable.style.display === "none" &&
+    ticketRow.style.display === "" &&
+    document.querySelector("#projectsArrow").className === arrowDown
+  ) {
     projectDataTable.style.display = "";
   } else projectDataTable.style.display = "none";
 }
@@ -135,15 +145,14 @@ function showTicket(ticketTopic) {
 }
 
 function createTicket(ticket) {
+  let newHeader = document.createElement("h5");
+  let newPar = document.createElement("p");
 
-  let newHeader = document.createElement('h5');
-  let newPar = document.createElement('p');
+  newHeader.className = "card-title";
+  newHeader.id = "issueDescriptionLabel";
 
-  newHeader.className = 'card-title';
-  newHeader.id = 'issueDescriptionLabel';
-
-  newPar.className = 'card-text';
-  newPar.id = 'ticketDescription';
+  newPar.className = "card-text";
+  newPar.id = "ticketDescription";
 
   let issueText = ticket.issue;
   let textIssue = document.createTextNode(issueText);
@@ -165,7 +174,7 @@ function createTicket(ticket) {
 function removeTicket() {
   let ticketDescription = document.querySelector("#ticketDescription");
   ticketDescription.remove();
-  let ticketHeader = document.querySelector('#issueDescriptionLabel');
+  let ticketHeader = document.querySelector("#issueDescriptionLabel");
   ticketHeader.remove();
 
   ticketIsClicked = false;
@@ -265,17 +274,17 @@ function addNewTicket(ticket) {
   showDataTableAfterPosting();
 }
 
-function showDataTableAfterPosting(){
+function showDataTableAfterPosting() {
   removeDataTable();
-  setTimeout(function () {
-    if (lastStatusShown === '#openArrow'){
+  setTimeout(function() {
+    if (lastStatusShown === "#openArrow") {
       createDataTable(API_OPEN_TICKET_URL);
-    } else if (lastStatusShown === '#inProgressArrow'){
+    } else if (lastStatusShown === "#inProgressArrow") {
       createDataTable(API_IN_PROGRESS_TICKET_URL);
-    } else if (lastStatusShown === '#resolvedArrow'){
+    } else if (lastStatusShown === "#resolvedArrow") {
       createDataTable(API_RESOLVED_TICKET_URL);
     }
-  }, 100)
+  }, 100);
 }
 
 /*form.addEventListener(
