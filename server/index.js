@@ -10,6 +10,11 @@ const dotenv = require('dotenv').config();
 const passport = require('passport');
 const Auth0Strategy = require('passport-auth0');
 
+var path = require('path');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var flash = require('connect-flash');
+
 const userInViews = require('./lib/middleware/userInViews');
 const authRouter = require('./routes/auth');
 const indexRouter = require('./routes/index');
@@ -30,6 +35,13 @@ var strategy = new Auth0Strategy(
     return done(null, profile);
   }
 );
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+app.use(express.static(path.join(__dirname, 'views')));
+
+app.use(logger('dev'));
+app.use(cookieParser());
 
 var sess = {
   secret: process.env.AUTH0_SESSION_SECRET,
@@ -60,18 +72,15 @@ con.connect(function(err) {
   console.log("Connected!");
 });
 
-passport.use(strategy);
-
 app.use(session(sess));
+
+passport.use(strategy);
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(flash());
 app.use(cors());
 app.use(express.json());
-
-app.use(userInViews());
-app.use('/', authRouter);
-app.use('/', indexRouter);
-app.use('/', usersRouter);
 
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -81,10 +90,36 @@ passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.isAuthenticated();
+  next();
+});
+
+app.use(userInViews());
+app.use('/', authRouter);
+app.use('/', indexRouter);
+app.use('/', usersRouter);
+
+const secured = (req, res, next) => {
+  if (req.user) {
+    return next();
+  }
+  req.session.returnTo = req.originalUrl;
+  res.redirect("/login");
+};
+
 
 app.get('/', (request, response) => {
   response.json({
     message: 'Hello Worldayyyyyyy'
+  });
+});
+
+app.get("/user", secured, (req, res, next) => {
+  const { _raw, _json, ...userProfile } = req.user;
+  res.render("user", {
+    title: "Profile",
+    userProfile: userProfile
   });
 });
 
@@ -151,3 +186,5 @@ app.post('/tickets', (req, res) => {
 app.listen(5005, () => {
   console.log('listening on http://localhost:5005');
 });
+
+module.exports = app;
