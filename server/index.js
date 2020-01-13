@@ -26,7 +26,7 @@ var strategy = new Auth0Strategy(
     clientID: process.env.AUTH0_CLIENT_ID,
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
     callbackURL:
-      process.env.AUTH0_CALLBACK_URL || 'http://localhost:5500/callback'
+      process.env.AUTH0_CALLBACK_URL || 'http://localhost:5005/callback'
   },
   function (accessToken, refreshToken, extraParams, profile, done) {
     // accessToken is the token to call Auth0 API (not needed in the most cases)
@@ -36,9 +36,13 @@ var strategy = new Auth0Strategy(
   }
 );
 
+app.engine('html', require('ejs').renderFile);
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+app.set('view engine', 'html');
+
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
+
 
 app.use(logger('dev'));
 app.use(cookieParser());
@@ -115,12 +119,28 @@ app.get('/', (request, response) => {
   });
 });
 
-app.get("/user", secured, (req, res, next) => {
-  const { _raw, _json, ...userProfile } = req.user;
+/*
+const { _raw, _json, ...userProfile } = req.user;
   res.render("user", {
     title: "Profile",
     userProfile: userProfile
   });
+*/
+
+app.get("/index", secured, (req, res, next) => {
+  res.render(__dirname + '/views/index.html');
+});
+
+app.get("/myProjects", secured, (req, res, next) => {
+  res.render(__dirname + '/views/myProjects.html');
+});
+
+app.get("/myTickets", secured, (req, res, next) => {
+  res.render(__dirname + '/views/myTickets.html');
+});
+
+app.get("/tables", secured, (req, res, next) => {
+  res.render(__dirname + '/views/tables.html');
 });
 
 app.get('/tickets', (request, response) => {
@@ -151,12 +171,6 @@ function isValidTicket(ticket){
   return ticket.topic && ticket.topic.toString().trim() != '' &&
           ticket.issue && ticket.issue.toString().trim() != '';
 }
-
-
-app.use(rateLimit({
-  windowMs: 15 * 1000,
-  max: 1
-}));
 
 app.post('/tickets', (req, res) => {
   if (isValidTicket(req.body)) {
