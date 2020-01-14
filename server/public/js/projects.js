@@ -40,6 +40,7 @@ let lastStatusShown = "";
 let arrowDown = "fas fa-angle-down";
 let arrowRight = "fas fa-angle-right";
 
+
 newTicketFooter.addEventListener("click", function(event) {
   event.preventDefault();
   removeDataTable();
