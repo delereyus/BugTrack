@@ -21,6 +21,7 @@ const userInViews = require("./lib/middleware/userInViews");
 const authRouter = require("./routes/auth");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
+const ticketRouter = require('./routes/tickets');
 
 var strategy = new Auth0Strategy(
   {
@@ -104,6 +105,7 @@ app.use(userInViews());
 app.use("/", authRouter);
 app.use("/", indexRouter);
 app.use("/", usersRouter);
+app.use('/', ticketRouter);
 
 const secured = (req, res, next) => {
   if (req.user) {
@@ -113,13 +115,13 @@ const secured = (req, res, next) => {
   res.redirect("/login");
 };
 
-/*
-const { _raw, _json, ...userProfile } = req.user;
+
+/*const { _raw, _json, ...userProfile } = req.user;
   res.render("user", {
     title: "Profile",
     userProfile: userProfile
-  });
-*/
+  });*/
+
 
 /*app.get("/", secured, (req, res, next) => {
   res.render(__dirname + '/views/index.html');
@@ -149,7 +151,7 @@ app.get("/users", (request, response) => {
 
 app.get("/tickets", (request, response) => {
   con.query(
-    "SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.project = a.projectId JOIN allprojects p ON p.projectId = a.projectId ORDER BY submitDate DESC, submitTime DESC;",
+    "SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.userId = a.submitterId JOIN allprojects p ON p.projectId = a.projectId ORDER BY submitDate DESC, submitTime DESC;",
     function(err, data) {
       response.send(data);
     }
@@ -158,7 +160,7 @@ app.get("/tickets", (request, response) => {
 
 app.get("/ticketsopen", (request, response) => {
   con.query(
-    'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.project = a.projectId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "Open" ORDER BY submitDate DESC, submitTime DESC;',
+    'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.userId = a.submitterId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "Open" ORDER BY submitDate DESC, submitTime DESC;',
     function(err, data) {
       response.send(data);
     }
@@ -167,7 +169,7 @@ app.get("/ticketsopen", (request, response) => {
 
 app.get("/ticketsinprogress", (request, response) => {
   con.query(
-    'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.project = a.projectId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "In Progress" ORDER BY submitDate DESC, submitTime DESC;',
+    'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.userId = a.submitterId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "In Progress" ORDER BY submitDate DESC, submitTime DESC;',
     function(err, data) {
       response.send(data);
     }
@@ -176,26 +178,16 @@ app.get("/ticketsinprogress", (request, response) => {
 
 app.get("/ticketsresolved", (request, response) => {
   con.query(
-    'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.project = a.projectId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "Closed" ORDER BY submitDate DESC, submitTime DESC;',
+    'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.userId = a.submitterId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "Closed" ORDER BY submitDate DESC, submitTime DESC;',
     function(err, data) {
       response.send(data);
     }
   );
 });
 
-app.get("/getRoles", (request, response) => {
-  request(getUserRole, function(error, response, body) {
-    if (error) {
-      console.log("here is the problem");
-      throw new Error(error);
-    }
-    response.send(body);
-  });
-})
-
-app.get("/getUsers", (request, response, ) => {
-    console.log(getUserIds());
-    response.send(getUserIds());
+app.get("/getUsers", (request, response) => {
+  getUserIds();
+  response.send("ayyy");
 });
 
 var getAllUsers = {
@@ -222,61 +214,76 @@ var getUserRole = {
   json: true
 };
 
-function getRole() {
-  request(getUserRole, function(error, response, body) {
-    if (error) {
-      console.log("here is the problem");
-      throw new Error(error);
+function getRole(id) {
+  request(
+    {
+      method: "GET",
+      url: `https://dev--dymylky.eu.auth0.com/api/v2/users/${id}/roles`,
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer " + process.env.MANAGEMENT_API_ACCESS_TOKEN,
+        "cache-control": "no-cache"
+      },
+      json: true
+    },
+    function(error, response, body) {
+      if (error) {
+        console.log("here is the problem");
+        throw new Error(error);
+      }
+      let userRole = body[0].name;
+      try {
+        con.query(
+          `UPDATE users SET userRole = '${userRole}' WHERE authId = '${id}';`
+        );
+        console.log("success");
+      } catch (err) {
+        console.log("error getting roles");
+      }
+      console.log(body[0].name);
     }
-    console.log(body[0].name);
-  });
+  );
 }
 
 function getUserIds() {
   request(getAllUsers, function(error, response, body) {
     if (error) {
-      console.log("here is the problem");
+      console.log("here is the problem2323");
       throw new Error(error);
     }
-    return body;
+    let userInfo = body;
+    try {
+      con.query("SELECT * FROM users;", function(err, data) {
+        let allUsers = data;
+        let authIdArray = [];
+        userInfo.forEach(user => {
+          authIdArray.push(user.user_id);
+        })
+        userInfo.forEach(user => {
+          allUsers.forEach(dbUser => {
+            if (!authIdArray.includes(dbUser.authId)){
+              try {
+                con.query(
+                  `INSERT INTO users (username, firstname, lastname, email, authId) VALUES ('${user.username}', '${user.given_name}', '${user.family_name}', '${user.email}', '${user.user_id}');`
+                );
+              } catch (err) {
+                console.log("error inserting user into database");
+              }
+            }
+            if (dbUser.authId === user.user_id) {
+              getRole(dbUser.authId);
+            }
+          });
+        });
+      });
+    } catch (err) {
+      console.log("error inserting users");
+      console.log(err);
+    }
   });
 }
 
-app.post("/tickets", (req, res) => {
-  if (isValidTicket(req.body)) {
-    const ticket = {
-      submitterId: req.body.submitterId.toString(),
-      projectId: req.body.projectId.toString(),
-      topic: req.body.topic.toString(),
-      issue: req.body.issue.toString(),
-      date: req.body.date.toString(),
-      time: req.body.time.toString()
-    };
-    try {
-      con.query(
-        `INSERT INTO alltickets (submitterId, topic, issue, submitDate, submitTime) VALUES (${ticket.submitterId}, '${ticket.topic}', '${ticket.issue}', '${ticket.date}', '${ticket.time}');`
-      );
-      res.send("Successfully posted ticket!");
-    } catch (err) {
-      console.log("there has been an error");
-    }
-    console.log(ticket);
-  } else {
-    res.status(422);
-    res.json({
-      message: "Failed to post ticket"
-    });
-  }
-});
 
-function isValidTicket(ticket) {
-  return (
-    ticket.topic &&
-    ticket.topic.toString().trim() != "" &&
-    ticket.issue &&
-    ticket.issue.toString().trim() != ""
-  );
-}
 
 app.listen(5005, () => {
   console.log("listening on http://localhost:5005");

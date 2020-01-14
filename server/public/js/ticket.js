@@ -1,10 +1,32 @@
-const API_ALL_TICKETS_URL = "http://localhost:5005/tickets";
-const API_OPEN_TICKET_URL = "http://localhost:5005/ticketsopen";
-const API_IN_PROGRESS_TICKET_URL = "http://localhost:5005/ticketsinprogress";
-const API_RESOLVED_TICKET_URL = "http://localhost:5005/ticketsresolved";
 const form = document.querySelector("#ticketForm");
 
+const API_ALL_TICKETS_URL = "http://localhost:5005/tickets";
 listAllTickets(API_ALL_TICKETS_URL);
+
+form.addEventListener(
+  "submit",
+  function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    const formData = new FormData(form);
+    const topic = formData.get("topic");
+    const issue = formData.get("issue");
+    const time = getTime();
+    const date = getDate();
+    const newTicket = {
+      projectId: 1,
+      topic: topic,
+      issue: issue,
+      date,
+      time
+    };
+    console.log(newTicket);
+    addNewTicket(newTicket);
+    form.reset();
+  },
+  false
+);
 
 function listAllTickets(status) {
   fetch(status)
@@ -28,7 +50,7 @@ function listAllTickets(status) {
 }
 
 function addNewTicket(ticket) {
-  fetch(API_URL, {
+  fetch(API_ALL_TICKETS_URL, {
     method: "POST",
     body: JSON.stringify(ticket),
     headers: {
