@@ -190,6 +190,7 @@ function createDataTable(ticketUrl) {
       .then(response => response.json())
       .then(tickets => {
         tickets.forEach(ticket => {
+
           let newTableRow = document.createElement("tr");
 
           let prjName = document.createElement("td");

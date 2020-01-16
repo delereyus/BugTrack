@@ -29,22 +29,35 @@ form.addEventListener(
 );
 
 function listAllTickets(status) {
-  fetch(status)
+  let roleForTest;
+
+  fetch("http://localhost:5005/users")
     .then(response => response.json())
-    .then(tickets => {
-      tickets.forEach(ticket => {
-  var newTicket = document.createElement("li");
-  var ticketSpan = document.createElement("span");
-  ticketSpan.className = "text-white clearfix medium z-1";
+    .then(roleObject => {
+      roleObject.forEach(role => {
+        roleForTest = role.userRole;
+        console.log(roleForTest);
+        fetch(status)
+          .then(response => response.json())
+          .then(tickets => {
+            tickets.forEach(ticket => {
+              console.log(ticket.userRole);
+              if (roleForTest == ticket.userRole) {
+                var newTicket = document.createElement("li");
+                var ticketSpan = document.createElement("span");
+                ticketSpan.className = "text-white clearfix medium z-1";
 
-  var texter = ticket.topic;
-  var text = document.createTextNode(texter);
-  ticketSpan.appendChild(text);
+                var texter = ticket.topic;
+                var text = document.createTextNode(texter);
+                ticketSpan.appendChild(text);
 
-  newTicket.appendChild(ticketSpan);
+                newTicket.appendChild(ticketSpan);
 
-  var ticketList = document.querySelector(".ticketList");
-  ticketList.appendChild(newTicket);
+                var ticketList = document.querySelector(".ticketList");
+                ticketList.appendChild(newTicket);
+              }
+            });
+          });
       });
     });
 }

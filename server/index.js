@@ -129,6 +129,7 @@ const secured = (req, res, next) => {
 
 app.get("/index", secured, (req, res, next) => {
   res.render(__dirname + "/views/index.html");
+  console.log(req.user);
 });
 
 app.get("/myProjects", secured, (req, res, next) => {
@@ -143,13 +144,17 @@ app.get("/tables", secured, (req, res, next) => {
   res.render(__dirname + "/views/tables.html");
 });
 
-app.get("/users", (request, response) => {
-  con.query("SELECT u.userRole FROM users u;", function(err, data) {
+app.get("/users", secured, (request, response) => {
+  con.query(`SELECT u.userRole FROM users u WHERE u.authId = '${request.user.user_id}';`, function(err, data) {
     response.send(data);
   });
 });
 
-app.get("/tickets", (request, response) => {
+app.get("/currentUserRole", secured, (req, res, next) => {
+  res.send(req.user.app_metadata[0]);
+})
+
+app.get("/tickets", secured, (request, response) => {
   con.query(
     "SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.userId = a.submitterId JOIN allprojects p ON p.projectId = a.projectId ORDER BY submitDate DESC, submitTime DESC;",
     function(err, data) {
@@ -158,7 +163,7 @@ app.get("/tickets", (request, response) => {
   );
 });
 
-app.get("/ticketsopen", (request, response) => {
+app.get("/ticketsopen", secured, (request, response) => {
   con.query(
     'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.userId = a.submitterId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "Open" ORDER BY submitDate DESC, submitTime DESC;',
     function(err, data) {
@@ -167,7 +172,7 @@ app.get("/ticketsopen", (request, response) => {
   );
 });
 
-app.get("/ticketsinprogress", (request, response) => {
+app.get("/ticketsinprogress", secured, (request, response) => {
   con.query(
     'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.userId = a.submitterId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "In Progress" ORDER BY submitDate DESC, submitTime DESC;',
     function(err, data) {
@@ -176,7 +181,7 @@ app.get("/ticketsinprogress", (request, response) => {
   );
 });
 
-app.get("/ticketsresolved", (request, response) => {
+app.get("/ticketsresolved", secured, (request, response) => {
   con.query(
     'SELECT p.projectName, u.userName, u.userRole, a.topic, a.issue, a.submitDate, a.submitTime, a.issueStatus FROM alltickets a JOIN users u ON u.userId = a.submitterId JOIN allprojects p ON p.projectId = a.projectId WHERE issueStatus = "Closed" ORDER BY submitDate DESC, submitTime DESC;',
     function(err, data) {
@@ -185,7 +190,7 @@ app.get("/ticketsresolved", (request, response) => {
   );
 });
 
-app.get("/getUsers", (request, response) => {
+app.get("/getUsers", secured, (request, response) => {
   getUserIds();
   response.send("ayyy");
 });
