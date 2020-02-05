@@ -70,7 +70,7 @@ function addNewTicket(ticket) {
       "content-type": "application/json"
     }
   });
-  var newTicket = document.createElement("p");
+  /*var newTicket = document.createElement("p");
   var texter = ticket.topic + ", " + ticket.issue;
   var text = document.createTextNode(texter);
   newTicket.appendChild(text);
@@ -78,7 +78,7 @@ function addNewTicket(ticket) {
 
   var parent = document.getElementById("newTickets");
   parent.appendChild(newTicket);
-  console.log("ay2");
+  console.log("ay2");*/
 }
 
 function getDate() {

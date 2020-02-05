@@ -21,7 +21,7 @@ const userInViews = require("./lib/middleware/userInViews");
 const authRouter = require("./routes/auth");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
-const ticketRouter = require('./routes/tickets');
+const ticketRouter = require("./routes/tickets");
 
 var strategy = new Auth0Strategy(
   {
@@ -105,7 +105,7 @@ app.use(userInViews());
 app.use("/", authRouter);
 app.use("/", indexRouter);
 app.use("/", usersRouter);
-app.use('/', ticketRouter);
+app.use("/", ticketRouter);
 
 const secured = (req, res, next) => {
   if (req.user) {
@@ -115,17 +115,15 @@ const secured = (req, res, next) => {
   res.redirect("/login");
 };
 
-
 /*const { _raw, _json, ...userProfile } = req.user;
   res.render("user", {
     title: "Profile",
     userProfile: userProfile
   });*/
 
-
-/*app.get("/", secured, (req, res, next) => {
-  res.render(__dirname + '/views/index.html');
-});*/
+app.get("/", secured, (req, res, next) => {
+  res.render(__dirname + "/views/index.html");
+});
 
 app.get("/index", secured, (req, res, next) => {
   res.render(__dirname + "/views/index.html");
@@ -145,14 +143,17 @@ app.get("/tables", secured, (req, res, next) => {
 });
 
 app.get("/users", secured, (request, response) => {
-  con.query(`SELECT u.userRole FROM users u WHERE u.authId = '${request.user.user_id}';`, function(err, data) {
-    response.send(data);
-  });
+  con.query(
+    `SELECT u.userRole FROM users u WHERE u.authId = '${request.user.user_id}';`,
+    function(err, data) {
+      response.send(data);
+    }
+  );
 });
 
 app.get("/currentUserRole", secured, (req, res, next) => {
   res.send(req.user.app_metadata[0]);
-})
+});
 
 app.get("/tickets", secured, (request, response) => {
   con.query(
@@ -195,100 +196,125 @@ app.get("/getUsers", secured, (request, response) => {
   response.send("ayyy");
 });
 
-var getAllUsers = {
-  method: "GET",
-  url: "https://dev--dymylky.eu.auth0.com/api/v2/users",
-  headers: {
-    "content-type": "application/json",
-    authorization: "Bearer " + process.env.MANAGEMENT_API_ACCESS_TOKEN,
-    "cache-control": "no-cache"
-  },
-  //body: {roles: [process.env.AUTH0_ROLE_NEW_USER]},
-  json: true
-};
-
-var getUserRole = {
-  method: "GET",
-  url: `https://dev--dymylky.eu.auth0.com/api/v2/users/INSERT HERE/roles`,
-  headers: {
-    "content-type": "application/json",
-    authorization: "Bearer " + process.env.MANAGEMENT_API_ACCESS_TOKEN,
-    "cache-control": "no-cache"
-  },
-  //body: {roles: [process.env.AUTH0_ROLE_NEW_USER]},
-  json: true
-};
 
 function getRole(id) {
-  request(
-    {
-      method: "GET",
-      url: `https://dev--dymylky.eu.auth0.com/api/v2/users/${id}/roles`,
-      headers: {
-        "content-type": "application/json",
-        authorization: "Bearer " + process.env.MANAGEMENT_API_ACCESS_TOKEN,
-        "cache-control": "no-cache"
+  request(options, function(error, response, body) {
+    var hej = JSON.parse(body);
+    request(
+      {
+        method: "GET",
+        url: `https://dev--dymylky.eu.auth0.com/api/v2/users/${id}/roles`,
+        headers: {
+          "content-type": "application/json",
+          authorization: "Bearer " + hej.access_token,
+          "cache-control": "no-cache"
+        },
+        json: true
       },
-      json: true
-    },
-    function(error, response, body) {
-      if (error) {
-        console.log("here is the problem");
-        throw new Error(error);
+      function(error, response, body) {
+        if (error) {
+          console.log("here is the problem");
+          throw new Error(error);
+        }
+        let userRole = body[0].name;
+        try {
+          con.query(
+            `UPDATE users SET userRole = '${userRole}' WHERE authId = '${id}';`
+          );
+          console.log("success");
+        } catch (err) {
+          console.log("error getting roles");
+        }
+        console.log(body[0].name);
       }
-      let userRole = body[0].name;
-      try {
-        con.query(
-          `UPDATE users SET userRole = '${userRole}' WHERE authId = '${id}';`
-        );
-        console.log("success");
-      } catch (err) {
-        console.log("error getting roles");
-      }
-      console.log(body[0].name);
-    }
-  );
-}
-
-function getUserIds() {
-  request(getAllUsers, function(error, response, body) {
-    if (error) {
-      console.log("here is the problem2323");
-      throw new Error(error);
-    }
-    let userInfo = body;
-    try {
-      con.query("SELECT * FROM users;", function(err, data) {
-        let allUsers = data;
-        let authIdArray = [];
-        userInfo.forEach(user => {
-          authIdArray.push(user.user_id);
-        })
-        userInfo.forEach(user => {
-          allUsers.forEach(dbUser => {
-            if (!authIdArray.includes(dbUser.authId)){
-              try {
-                con.query(
-                  `INSERT INTO users (username, firstname, lastname, email, authId) VALUES ('${user.username}', '${user.given_name}', '${user.family_name}', '${user.email}', '${user.user_id}');`
-                );
-              } catch (err) {
-                console.log("error inserting user into database");
-              }
-            }
-            if (dbUser.authId === user.user_id) {
-              getRole(dbUser.authId);
-            }
-          });
-        });
-      });
-    } catch (err) {
-      console.log("error inserting users");
-      console.log(err);
-    }
+    );
   });
 }
 
+function getSomething() {
+  request(options, function(error, response, body) {
+    var hej = JSON.parse(body);
+    request(
+      {
+        method: "GET",
+        url: `https://dev--dymylky.eu.auth0.com/api/v2/users`,
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${hej.access_token}`,
+          "cache-control": "no-cache"
+        },
+        json: true
+      },
+      function(error, response, body) {
+        if (error) throw new Error(error);
+      }
+    );
+  });
+}
 
+function getUserIds() {
+  request(options, function(error, response, body) {
+    var hej = JSON.parse(body);
+    request(
+      {
+      method: "GET",
+      url: "https://dev--dymylky.eu.auth0.com/api/v2/users",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer " + hej.access_token,
+        "cache-control": "no-cache"
+      },
+      //body: {roles: [process.env.AUTH0_ROLE_NEW_USER]},
+      json: true
+      }, function(error, response, body) {
+      if (error) {
+        console.log("here is the problem2323");
+        throw new Error(error);
+      }
+      let userInfo = body;
+      try {
+        con.query("SELECT * FROM users;", function(err, data) {
+          let allUsers = data;
+          let authIdArray = [];
+          userInfo.forEach(user => {
+            authIdArray.push(user.user_id);
+          });
+          userInfo.forEach(user => {
+            allUsers.forEach(dbUser => {
+              if (!authIdArray.includes(dbUser.authId)) {
+                try {
+                  con.query(
+                    `INSERT INTO users (username, firstname, lastname, email, authId) VALUES ('${user.username}', '${user.given_name}', '${user.family_name}', '${user.email}', '${user.user_id}');`
+                  );
+                } catch (err) {
+                  console.log("error inserting user into database");
+                }
+              }
+              if (dbUser.authId === user.user_id) {
+                getRole(dbUser.authId);
+              }
+            });
+          });
+        });
+      } catch (err) {
+        console.log("error inserting users");
+        console.log(err);
+      }
+    });
+  });
+}
+
+var options = {
+  method: "POST",
+  url: "https://dev--dymylky.eu.auth0.com/oauth/token",
+  headers: { "content-type": "application/x-www-form-urlencoded" },
+  form: {
+    grant_type: "client_credentials",
+    client_id: process.env.MANAGEMENT_API_CLIENT_ID,
+    client_secret: process.env.MANAGEMENT_API_CLIENT_SECRET,
+    audience: "https://dev--dymylky.eu.auth0.com/api/v2/"
+  }
+};
 
 app.listen(5005, () => {
   console.log("listening on http://localhost:5005");
