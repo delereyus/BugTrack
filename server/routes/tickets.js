@@ -1,4 +1,4 @@
-var express = require('express');
+/*var express = require('express');
 var router = express.Router();
 const mysql = require("mysql");
 const dotenv = require("dotenv").config();
@@ -65,4 +65,4 @@ function isValidTicket(ticket) {
   );
 }
 
-module.exports = router;
+module.exports = router;*/

@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -17,18 +14,15 @@
     "dotenv": "^8.2.0",
     "ejs": "^3.0.1",
     "express": "^4.17.1",
-    "express-rate-limit": "^5.0.0",
     "express-session": "^1.17.0",
     "jsonwebtoken": "^8.5.1",
     "lodash.update": "^4.10.2",
     "moment": ">=2.19.3",
     "morgan": "^1.9.1",
     "mysql": "^2.17.1",
-    "node-fetch": "^2.6.0",
     "passport": "^0.4.1",
     "passport-auth0": "^1.3.1",
-    "path": "^0.12.7",
-    "pug": "^2.0.4"
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
