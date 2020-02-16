@@ -195,6 +195,35 @@ app.get("/getUsers", secured, (request, response) => {
   response.send("ayyy");
 });
 
+app.post("/updateTicket", secured, (req, res) => {
+  let usId = req.user.user_id;
+
+  console.log(req.body.topic);
+
+  try{
+    con.query(`SELECT ticketId FROM alltickets WHERE topic = '${req.body.topic}';`, function (err, data) {
+      try {
+        console.log(data);
+        let tickId = data[0].ticketId;
+        con.query(`UPDATE alltickets SET issueStatus = '${req.body.issueStatus}' WHERE ticketId = '${tickId}';`);
+        try{
+          con.query(`SELECT userId FROM users WHERE authId = '${usId}';`, function (err, data){
+            con.query(`UPDATE alltickets SET assignedUser = '${data[0].userId}' WHERE ticketId = '${tickId}';`);
+          });
+        } catch(err){
+          console.log(err);
+        }
+      } catch(err){
+        console.log(err)
+      }
+    });
+  } catch (err){
+    console.log(err);
+  }
+  
+  res.send("updated");
+});
+
 app.post("/tickets", (req, res) => {
   console.log(req.body);
   console.log(req.user.user_id);
@@ -223,7 +252,7 @@ app.post("/tickets", (req, res) => {
           console.log("there has been an error");
         }
         console.log(ticket);
-      })
+      });
     } catch(err){
      console.log(err);
     }

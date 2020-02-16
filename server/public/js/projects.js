@@ -1,3 +1,5 @@
+//const update = require("lodash.update");
+
 const ticketRow = document.querySelector("#ticketRow");
 const projects = document.querySelectorAll(".projectList");
 const projectDataTable = document.querySelector("#projectDataTable");
@@ -27,6 +29,8 @@ const API_OPEN_TICKET_URL = "http://localhost:5005/ticketsopen";
 const API_IN_PROGRESS_TICKET_URL = "http://localhost:5005/ticketsinprogress";
 const API_RESOLVED_TICKET_URL = "http://localhost:5005/ticketsresolved";
 
+const updateTicketUrl = "http://localhost:5005/updateTicket";
+
 projectDataTable.style.display = "none";
 ticketRow.style.display = "none";
 issueDescriptionContainer.style.display = "none";
@@ -34,12 +38,12 @@ issueDescriptionContainer.style.display = "none";
 let projectsIsClicked = false;
 let dataTableIsClicked = false;
 let ticketIsClicked = false;
+let claimButtonExists = false;
 let lastTicketShown = "";
 let lastStatusShown = "";
 
 let arrowDown = "fas fa-angle-down";
 let arrowRight = "fas fa-angle-right";
-
 
 newTicketFooter.addEventListener("click", function(event) {
   event.preventDefault();
@@ -115,8 +119,7 @@ function changeArrow(target) {
 }
 
 function dataTableDisplay() {
-  if 
-  (
+  if (
     projectDataTable.style.display === "none" &&
     ticketRow.style.display === "" &&
     document.querySelector("#projectsArrow").className === arrowDown
@@ -131,18 +134,60 @@ function showTicket(ticketTopic) {
       tickets.forEach(ticket => {
         if (ticket.topic == ticketTopic) {
           if (!ticketIsClicked) {
+            removeClaimButton();
             createTicket(ticket);
+            createClaimTicketButton(ticket);
           } else if (ticketIsClicked && lastTicketShown === ticket.issue) {
             removeTicket();
+            removeClaimButton();
             lastTicketShown == "";
           } else if (ticketIsClicked && lastTicketShown != ticket.issue) {
             removeTicket();
+            removeClaimButton();
             createTicket(ticket);
+            createClaimTicketButton(ticket);
           }
         }
       });
     })
   );
+}
+
+function createClaimTicketButton(ticket) {
+  if (!claimButtonExists){
+    if ((ticket.issueStatus == "Open")) {
+      let newButton = document.createElement("button");
+      newButton.id = "claimButton";
+      newButton.innerHTML = "Claim";
+      newButton.addEventListener("click", function(event) {
+        event.preventDefault();
+
+        let updatedTicket = {
+          issueStatus: "In Progress",
+          topic: ticket.topic
+        }
+  
+        fetch(updateTicketUrl, {
+          method: "POST",
+          body: JSON.stringify(updatedTicket),
+          headers: {
+            "content-type": "application/json"
+          }
+        });
+      });
+  
+      ticketCard.appendChild(newButton);
+      claimButtonExists = true;
+    }
+  }
+}
+
+function removeClaimButton() {
+  if (claimButtonExists) {
+    let buttonToRemove = document.querySelector("#claimButton");
+    buttonToRemove.remove();
+  }
+  claimButtonExists = false;
 }
 
 function createTicket(ticket) {
@@ -190,7 +235,6 @@ function createDataTable(ticketUrl) {
       .then(response => response.json())
       .then(tickets => {
         tickets.forEach(ticket => {
-
           let newTableRow = document.createElement("tr");
 
           let prjName = document.createElement("td");
